@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"golang-gin-gorm-boilerplates/helper"
+	"golang-crud-gin/helper"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -13,12 +13,11 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "postgres"
-	dbName   = "test"
+	dbName   = "golang_test"
 )
 
 func DatabaseConnection() *gorm.DB {
 	sqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbName)
-
 	db, err := gorm.Open(postgres.Open(sqlInfo), &gorm.Config{})
 	helper.ErrorPanic(err)
 

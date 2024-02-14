@@ -1,6 +1,6 @@
-package tags
+package repository
 
-import "golang-gin-gorm-boilerplates/model"
+import "golang-crud-gin/model"
 
 type TagsRepository interface {
 	Save(tags model.Tags)

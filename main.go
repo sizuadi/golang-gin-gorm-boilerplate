@@ -1,29 +1,52 @@
 package main
 
 import (
+	"golang-crud-gin/config"
+	"golang-crud-gin/controller"
+	_ "golang-crud-gin/docs"
+	"golang-crud-gin/helper"
+	"golang-crud-gin/model"
+	"golang-crud-gin/repository"
+	"golang-crud-gin/router"
+	"golang-crud-gin/service"
 	"net/http"
-	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/rs/zerolog/log"
 )
 
-func main() {
-	router := gin.Default()
+//	@title			Tag Service API
+//	@version		1.0
+//	@description	A Tag service API in Go using Gin framework
 
-	router.GET("/", func(context *gin.Context) {
-		context.JSON(http.StatusOK, "welcome home")
-	})
+// @host		localhost:8888
+// @BasePath	/api
+func main() {
+
+	log.Info().Msg("Started Server!")
+	// Database
+	db := config.DatabaseConnection()
+	validate := validator.New()
+
+	db.Table("tags").AutoMigrate(&model.Tags{})
+
+	// Repository
+	tagsRepository := repository.NewTagsREpositoryImpl(db)
+
+	// Service
+	tagsService := service.NewTagsServiceImpl(tagsRepository, validate)
+
+	// Controller
+	tagsController := controller.NewTagsController(tagsService)
+
+	// Router
+	routes := router.NewRouter(tagsController)
 
 	server := &http.Server{
-		Addr:           ":8888",
-		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		Addr:    ":8888",
+		Handler: routes,
 	}
 
 	err := server.ListenAndServe()
-	if err != nil {
-		panic(err)
-	}
+	helper.ErrorPanic(err)
 }
